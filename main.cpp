@@ -1,40 +1,40 @@
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
-#include <stack>
-#include <map>
+#include <bits/stdc++.h>
+typedef long long ll;
 
 using namespace std;
 
-void demo1() {
-   
-}
+struct doctor {
+    string id;
+    string specializare;
+    // bool ocupat = false;
+    ll time = 0;
+    vector<string> probleme;
+};
+
+struct pacient {
+    string problema;
+    string specializare;
+    ll timp;
+};
 
 int main()
 {
-    ifstream inFile("input.txt");
-    stack<pair<string, string>> pacienti;
-    map<string, string> doctori;
-    vector<string> pac, cauza; 
-    string doctoriiii;
-
+    ifstream inFile("input4_bonus.txt");
+    vector<doctor> doctors;
+    vector<pacient> pacienti;
 
     int no_problems, no_doctors;
+    ll time;
     string name, speciality;
-    
+
     inFile >> no_problems;
 
     for (int i = 0; i < no_problems; i++)
     {
         inFile >> name;
         inFile >> speciality;
-        // pacienti.push(make_pair(name, speciality));
-
-        pac.push_back(name);
-        cauza.push_back(speciality);
-
-        /*cout << name << ' ' << speciality << '\n';*/
+        inFile >> time;
+        pacienti.push_back({name, speciality, time});
     }
 
     inFile >> no_doctors;
@@ -43,36 +43,25 @@ int main()
     {
         inFile >> name;
         inFile >> speciality;
-        // doctori[speciality] = name;
-
-        doctoriiii += speciality;
-        //cout << name << ' ' << speciality << '\n';
+        doctors.push_back({name, speciality});
     }
 
-    /*while (!pacienti.empty()) {
-        string cauza = pacienti.top().second;
-        if (!doctori[cauza].empty()) {
-            cout << pacienti.top().first << " Acceptat\n";
-        }
-        else {
-            cout << pacienti.top().first << " Respins\n";
-        }
-        pacienti.pop();
-    }*/
+    for(const auto& it : pacienti) {
+        auto index = find_if(begin(doctors), end(doctors), [&it](doctor& a) {
+            return it.specializare == a.specializare && a.time + it.timp <= 8;
+        });
 
-    for (auto it = 0; it < cauza.size(); ++it) {
-        
-        if (doctoriiii.find(cauza[it]) != string::npos) {
-            cout << pac[it] << " Acceptat\n";
-        }
-        else{
-            cout << pac[it] << " Respins\n";
+        if(index != doctors.end()) {
+            index->probleme.push_back(it.problema);
+            index->time += it.timp;
         }
     }
 
-
-
-
+    for(const auto& it : doctors) {
+        cout << it.id << " " << it.probleme.size() << " ";
+        for(const auto& prob : it.probleme) cout << prob << " ";
+        cout << endl;
+    }
 
     return 0;
 }
