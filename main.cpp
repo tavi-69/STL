@@ -15,16 +15,25 @@ struct pacient {
     string problema;
     string specializare;
     ll timp;
+    ll priority;
+
+    pacient(string p, string s, ll t, ll pr) : problema(p), specializare(s), timp(t), priority(pr) {}
+};
+struct compare_pacienti {
+    bool operator()(const pacient &p1, const pacient &p2) {
+        return p1.priority < p2.priority;
+    }
 };
 
 int main()
 {
-    ifstream inFile("input4_bonus.txt");
+    ifstream inFile("C:\\Users\\Thavian\\CLionProjects\\STL\\input.txt");
     vector<doctor> doctors;
-    vector<pacient> pacienti;
+//    vector<pacient> pacienti;
+    priority_queue<pacient, vector<pacient>, compare_pacienti> pacienti;
 
     int no_problems, no_doctors;
-    ll time;
+    ll time, prio;
     string name, speciality;
 
     inFile >> no_problems;
@@ -34,8 +43,13 @@ int main()
         inFile >> name;
         inFile >> speciality;
         inFile >> time;
-        pacienti.push_back({name, speciality, time});
+        inFile >> prio;
+        pacienti.emplace(name, speciality, time, prio);
     }
+
+//    sort(begin(pacienti), end(pacienti), [](pacient& a, pacient &b) {
+//       return a.priority > b.priority;
+//    });
 
     inFile >> no_doctors;
 
@@ -46,7 +60,8 @@ int main()
         doctors.push_back({name, speciality});
     }
 
-    for(const auto& it : pacienti) {
+    while(!pacienti.empty()) {
+        auto it = pacienti.top();
         auto index = find_if(begin(doctors), end(doctors), [&it](doctor& a) {
             return it.specializare == a.specializare && a.time + it.timp <= 8;
         });
@@ -55,9 +70,11 @@ int main()
             index->probleme.push_back(it.problema);
             index->time += it.timp;
         }
+        pacienti.pop();
     }
 
     for(const auto& it : doctors) {
+        if(it.probleme.empty()) continue;
         cout << it.id << " " << it.probleme.size() << " ";
         for(const auto& prob : it.probleme) cout << prob << " ";
         cout << endl;
